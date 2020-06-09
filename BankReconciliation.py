@@ -6,6 +6,7 @@ from openpyxl import load_workbook
 import datetime
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
+from openpyxl.styles import Font, Border, Side
 
 
 #global variables
@@ -17,8 +18,8 @@ def remove_values_from_list(the_list, val):
    return [value for value in the_list if value != val] 
 
 def sheet_setup(sheet):
-    a = 'A1'
-    sheet[a] = 'Bank Statement'
+    
+    sheet['A1'] = 'Bank Statement'
     sheet['F1'] = 'General Ledger'
     sheet['A2'] = 'Date'
     sheet['B2'] = 'Source Num'
@@ -30,6 +31,22 @@ def sheet_setup(sheet):
     sheet['H2'] = 'Comment'
     sheet['I2'] = 'Debit'
     sheet['J2'] = 'Credit'
+
+    sheet['A1'].font = Font(size=14, underline="single", bold=True)
+    sheet['F1'].font = Font(size=14, underline="single", bold=True)
+
+    
+
+    row = sheet['A2':'J2']
+    row = row[0]
+    
+    for cell in row:
+        cell.border = Border(bottom=Side(border_style="thin"))
+        cell.font = Font(bold=True)
+
+    sheet['E2'].border = Border(right=Side(border_style="thin"), bottom=Side(border_style='thin'))
+    
+    
 
 
 def populate(sheet, bank_or_ledger, list):
@@ -43,6 +60,8 @@ def populate(sheet, bank_or_ledger, list):
         for j in range(len(cells)):
             cell_index = cells[j] + str(i)
             sheet[cell_index] = list[i-3][entry_order[j]]
+        e_cell = 'E' + str(i)
+        sheet[e_cell].border = Border(right=Side(border_style='thin'))
 
 #solution by velis at https://stackoverflow.com/questions/13197574/openpyxl-adjust-column-width-size
 def resize_sheet_columns(sheet):
@@ -52,7 +71,7 @@ def resize_sheet_columns(sheet):
             if cell.value:
                 dims[cell.column_letter] = max((dims.get(cell.column_letter, 0), len(str(cell.value))))    
     for col, value in dims.items():
-        sheet.column_dimensions[col].width = value
+        sheet.column_dimensions[col].width = value + 2
 
 def reconcile():
     if (bank_statement_path == None or general_ledger_path == None):
@@ -60,7 +79,8 @@ def reconcile():
     else:   
         CSV = processCSV()
         excel = processExcel()
-        excel.reverse()
+        ascending_dates(CSV)
+        ascending_dates(excel)
         
         entry_lists = {}
         
@@ -218,15 +238,35 @@ def reconcile():
 def removeExtraSpaces(string):
     return(" ".join(string.split()))
 
-'''
+def ascending_dates(list):
+    first_date = list[0]["date"]
+    last_date = list[-1]["date"]
+
+    first_day = first_date.split("-")[2]
+    last_day = last_date.split("-")[2]
+
+    if int(first_day) > int(last_day):
+        list.reverse()
+
+
+
 def standardize_date_string(string):
     split_string = string.split('-')
     new_string = ''
     year = split_string[2]
     new_string += '20' + year + '-'
-    
-    months = {"Jan"}
-'''
+    orig_month = split_string[1]
+    if len(orig_month) != 3:
+        orig_month = orig_month[:3]
+
+    months = {"Jan":"01","Feb":"02","Mar":"03","Apr":"04","May":"05","Jun":"06","Jul":"07","Aug":"08","Sep":"09","Oct":"10","Nov":"11","Dec":"12"}
+    new_month = months[orig_month]
+
+    new_string += new_month + '-'
+
+    new_string += split_string[0]
+
+    return new_string
 
 def processCSV():
     formattedCSV = []
@@ -234,7 +274,7 @@ def processCSV():
         csv_reader = reader(csvfile)
         for row in csv_reader:
             entry = {}
-            entry["date"] = row[1]
+            entry["date"] = standardize_date_string(row[1])
             entry["comment"] = removeExtraSpaces(row[2])
             entry["source_num"] = str(row[3]).strip()
             entry["credit"] = str(row[4]).strip()
