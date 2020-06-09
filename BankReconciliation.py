@@ -44,6 +44,16 @@ def populate(sheet, bank_or_ledger, list):
             cell_index = cells[j] + str(i)
             sheet[cell_index] = list[i-3][entry_order[j]]
 
+#solution by velis at https://stackoverflow.com/questions/13197574/openpyxl-adjust-column-width-size
+def resize_sheet_columns(sheet):
+    dims = {}
+    for row in sheet.rows:
+        for cell in row:
+            if cell.value:
+                dims[cell.column_letter] = max((dims.get(cell.column_letter, 0), len(str(cell.value))))    
+    for col, value in dims.items():
+        sheet.column_dimensions[col].width = value
+
 def reconcile():
     if (bank_statement_path == None or general_ledger_path == None):
         pass
@@ -170,6 +180,9 @@ def reconcile():
         populate(unmatched_entries, 'bank_statement', CSV)
         populate(unmatched_entries, 'general_ledger', excel)
 
+        for sheet in sheets:
+            resize_sheet_columns(sheet)
+
         
         work_book.save(filename = wb_filename)
 
@@ -205,6 +218,7 @@ def reconcile():
 def removeExtraSpaces(string):
     return(" ".join(string.split()))
 
+'''
 def standardize_date_string(string):
     split_string = string.split('-')
     new_string = ''
@@ -212,6 +226,7 @@ def standardize_date_string(string):
     new_string += '20' + year + '-'
     
     months = {"Jan"}
+'''
 
 def processCSV():
     formattedCSV = []
@@ -286,12 +301,12 @@ bank_statement_name.set('None')
 general_ledger_name = StringVar()
 general_ledger_name.set('None')
 
-ttk.Label(mainframe, text='Select Bank File:').grid(column=0, row=0, sticky=W, padx=(50, 15), pady=5)
+ttk.Label(mainframe, text='Select Bank Statement:').grid(column=0, row=0, sticky=W, padx=(50, 15), pady=5)
 ttk.Button(mainframe, text='Choose .csv File', command=select_bank_file).grid(column=1, row=0, padx=(15,50), pady=5)
 ttk.Label(mainframe, text='Selected File:').grid(column=0, row=1, padx=(50, 15), pady=5, sticky=W)
 ttk.Label(mainframe, textvariable=bank_statement_name).grid(column=1, row=1, padx = 15, pady=5, sticky=W)
 
-ttk.Label(mainframe, text='Select Sage File:').grid(column=2, row=0, sticky=W, padx=(50, 15), pady=5)
+ttk.Label(mainframe, text='Select General Ledger:').grid(column=2, row=0, sticky=W, padx=(50, 15), pady=5)
 ttk.Button(mainframe, text='Choose .xlsx File', command=select_sage_file).grid(column=3, row=0, padx=(15, 50), pady=5)
 ttk.Label(mainframe, text='Selected File:').grid(column=2, row=1, padx=(50,15), pady=5, sticky=W)
 ttk.Label(mainframe, textvariable=general_ledger_name).grid(column=3, row=1, padx=(15,50), pady=5, sticky=W)
