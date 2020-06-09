@@ -15,10 +15,26 @@ general_ledger_path = None
 
 #solution found at https://stackoverflow.com/questions/44033894/removing-common-values-from-two-lists-in-python/44033987
 def remove_values_from_list(the_list, val):
-   return [value for value in the_list if value != val] 
+    '''Removes all instances of a specified value from a list.
+
+    Args:
+        the_list - list which will have a specified value removed from it
+        val - the value which you would like removed from the list
+
+    Returns:
+        new_list - the new list which does not contain the specified value
+
+    '''
+    return [value for value in the_list if value != val] 
+
 
 def sheet_setup(sheet):
-    
+    '''Creates the headers for each sheet of the excel report, and styles them
+
+    Args:
+        sheet - excel worksheet which will have the header added to it.
+    '''
+
     sheet['A1'] = 'Bank Statement'
     sheet['F1'] = 'General Ledger'
     sheet['A2'] = 'Date'
@@ -50,6 +66,14 @@ def sheet_setup(sheet):
 
 
 def populate(sheet, bank_or_ledger, list):
+    '''Populates a given worksheet with the data provided in the list
+
+    Args:
+        sheet - The excel worksheet which is to have data added to it
+        bank_or_ledger - a string that contains bank_statement or general_ledger. This indicates what side of the worksheet to be populated
+        list - The list of entries which are to be added to the specified excel worksheet 
+
+    '''
     if bank_or_ledger == 'bank_statement':
         cells = ['A', 'B', 'C', 'D', 'E']
     else:
@@ -65,6 +89,11 @@ def populate(sheet, bank_or_ledger, list):
 
 #solution by velis at https://stackoverflow.com/questions/13197574/openpyxl-adjust-column-width-size
 def resize_sheet_columns(sheet):
+    '''Resizes the columns of the excel report to automatically fit the included data.
+
+    Args: 
+        sheet - the excel worksheet that will have its columns adjusted.
+    '''
     dims = {}
     for row in sheet.rows:
         for cell in row:
@@ -74,6 +103,11 @@ def resize_sheet_columns(sheet):
         sheet.column_dimensions[col].width = value + 2
 
 def reconcile():
+    '''The main function that is called when the reconcile button is clicked. This function handles the 
+    data included in the attached files, then processes it and organizes it into specific lists. Then, 
+    the data is written into an excel file and saved onto the local computer.
+
+    '''
     if (bank_statement_path == None or general_ledger_path == None):
         pass
     else:   
