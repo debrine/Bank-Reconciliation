@@ -360,32 +360,34 @@ def select_sage_file():
     
 
 
+def main():
+    root = Tk()
+    root.title("Bank Reconciliation")
 
-root = Tk()
-root.title("Bank Reconciliation")
+    mainframe = ttk.Frame(root, padding="3 3 12 12")
+    mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
+    root.columnconfigure(0, weight=1)
+    root.rowconfigure(0, weight=1)
 
-mainframe = ttk.Frame(root, padding="3 3 12 12")
-mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
-root.columnconfigure(0, weight=1)
-root.rowconfigure(0, weight=1)
+    bank_statement_name = StringVar()
+    bank_statement_name.set('None')
 
-bank_statement_name = StringVar()
-bank_statement_name.set('None')
+    general_ledger_name = StringVar()
+    general_ledger_name.set('None')
 
-general_ledger_name = StringVar()
-general_ledger_name.set('None')
+    ttk.Label(mainframe, text='Select Bank Statement:').grid(column=0, row=0, sticky=W, padx=(50, 15), pady=5)
+    ttk.Button(mainframe, text='Choose .csv File', command=select_bank_file).grid(column=1, row=0, padx=(15,50), pady=5)
+    ttk.Label(mainframe, text='Selected File:').grid(column=0, row=1, padx=(50, 15), pady=5, sticky=W)
+    ttk.Label(mainframe, textvariable=bank_statement_name).grid(column=1, row=1, padx = 15, pady=5, sticky=W)
 
-ttk.Label(mainframe, text='Select Bank Statement:').grid(column=0, row=0, sticky=W, padx=(50, 15), pady=5)
-ttk.Button(mainframe, text='Choose .csv File', command=select_bank_file).grid(column=1, row=0, padx=(15,50), pady=5)
-ttk.Label(mainframe, text='Selected File:').grid(column=0, row=1, padx=(50, 15), pady=5, sticky=W)
-ttk.Label(mainframe, textvariable=bank_statement_name).grid(column=1, row=1, padx = 15, pady=5, sticky=W)
+    ttk.Label(mainframe, text='Select General Ledger:').grid(column=2, row=0, sticky=W, padx=(50, 15), pady=5)
+    ttk.Button(mainframe, text='Choose .xlsx File', command=select_sage_file).grid(column=3, row=0, padx=(15, 50), pady=5)
+    ttk.Label(mainframe, text='Selected File:').grid(column=2, row=1, padx=(50,15), pady=5, sticky=W)
+    ttk.Label(mainframe, textvariable=general_ledger_name).grid(column=3, row=1, padx=(15,50), pady=5, sticky=W)
 
-ttk.Label(mainframe, text='Select General Ledger:').grid(column=2, row=0, sticky=W, padx=(50, 15), pady=5)
-ttk.Button(mainframe, text='Choose .xlsx File', command=select_sage_file).grid(column=3, row=0, padx=(15, 50), pady=5)
-ttk.Label(mainframe, text='Selected File:').grid(column=2, row=1, padx=(50,15), pady=5, sticky=W)
-ttk.Label(mainframe, textvariable=general_ledger_name).grid(column=3, row=1, padx=(15,50), pady=5, sticky=W)
-
-ttk.Button(mainframe, text='Reconcile', command=reconcile).grid(column=4, row=0, rowspan=2, padx=(50,15), pady=15)
+    ttk.Button(mainframe, text='Reconcile', command=reconcile).grid(column=4, row=0, rowspan=2, padx=(50,15), pady=15)
 
 
-root.mainloop()
+    root.mainloop()
+
+main()

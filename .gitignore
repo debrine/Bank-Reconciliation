@@ -1,4 +1,6 @@
 tkinter_tests/
 test_data/
 *.xlsx
+executable_linux/
 executable/
+executable_windows/
